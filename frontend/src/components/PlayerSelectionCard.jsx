@@ -7,13 +7,13 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
   const [positionFilter, setPositionFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [playersPerPage] = useState(10); // Number of players per page
+  const [playersPerPage] = useState(10);
 
   useEffect(() => {
-    // Fetch all players from the API
     const fetchPlayers = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/players/');
+        console.log('Fetched players:', response.data); // Debugging: log fetched data
         setPlayers(response.data);
       } catch (error) {
         console.error('Failed to fetch players:', error);
@@ -24,16 +24,15 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
   }, []);
 
   useEffect(() => {
-    // Filter players based on position and search query
     const filtered = players.filter(player => {
-      const positionMatch = positionFilter === 'all' || player.position === positionFilter;
+      const positionMatch = positionFilter === 'all' || player.element_type.toString() === positionFilter;
       const nameMatch = player.name.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery === '';
       return positionMatch && nameMatch;
     });
+    console.log('Filtered players:', filtered); // Debugging: log filtered data
     setFilteredPlayers(filtered);
   }, [players, positionFilter, searchQuery]);
 
-  // Pagination logic
   const indexOfLastPlayer = currentPage * playersPerPage;
   const indexOfFirstPlayer = indexOfLastPlayer - playersPerPage;
   const currentPlayers = filteredPlayers.slice(indexOfFirstPlayer, indexOfLastPlayer);
@@ -46,22 +45,20 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
     }
   };
 
-  // Handlers for position filter and search query
   const handlePositionFilterChange = event => setPositionFilter(event.target.value);
   const handleSearchInputChange = event => setSearchQuery(event.target.value);
 
   return (
     <div className="player-selection-card bg-gray-100 rounded-lg p-4">
-      {/* Filters and search input */}
       <div className="filter-container mb-4">
         <div className="mb-2">
-          <label htmlFor="position" className="block font-bold mb-1">Position:</label>
+          <label htmlFor="position" className="block font-bold mb-1">Element Type:</label>
           <select id="position" value={positionFilter} onChange={handlePositionFilterChange} className="w-full border-gray-300 rounded-md">
-            <option value="all">All Positions</option>
-            <option value="goalkeeper">Goalkeeper</option>
-            <option value="defender">Defender</option>
-            <option value="midfielder">Midfielder</option>
-            <option value="attacker">Attacker</option>
+            <option value="all">All Types</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
           </select>
         </div>
         <div>
@@ -70,14 +67,14 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
         </div>
       </div>
 
-      {/* Player list */}
       <div className="player-list">
-        <h3 className="text-lg font-bold mb-2">{positionFilter === 'all' ? 'All Players' : positionFilter.charAt(0).toUpperCase() + positionFilter.slice(1) + 's'}</h3>
+        <h3 className="text-lg font-bold mb-2">{positionFilter === 'all' ? 'All Players' : `Element Type ${positionFilter}`}</h3>
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-200">
               <th className="py-2 px-4">Name</th>
-              <th className="py-2 px-4">Element type</th>
+              <th className="py-2 px-4">Element Type</th>
+              <th className="py-2 px-4">Price</th>
 
               {/* Add other table headers */}
             </tr>
@@ -86,7 +83,9 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
             {currentPlayers.map(player => (
               <tr key={player.id} className="border-b border-gray-300">
                 <td className="py-2 px-4">{player.name}</td>
-                <td className='py-2 px-4'>{player.element_type}</td>
+                <td className="py-2 px-4">{player.element_type}</td>
+                <td className="py-2 px-4">{player.price}</td>
+
                 {/* Add other table data */}
               </tr>
             ))}
@@ -94,7 +93,6 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="pagination mt-4">
         <button
           onClick={() => paginate('prev')}

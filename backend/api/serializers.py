@@ -32,4 +32,4 @@ class TeamSerializer(serializers.ModelSerializer):
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['id', 'name', 'price', 'team', 'image']
+        fields = ['id', 'name', 'team', 'price', 'image', 'element_type']
