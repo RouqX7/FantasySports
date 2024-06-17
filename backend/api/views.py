@@ -26,7 +26,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
-class PlayerViewSet(viewsets.ModelViewSet):
+class PlayerListView(generics.ListAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
 

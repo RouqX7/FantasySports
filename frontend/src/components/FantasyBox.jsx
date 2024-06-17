@@ -1,89 +1,55 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "/src/assets/react.svg"; // Update this path to your logo image
+import logo from "/src/assets/Fantasy.png"; // Update this path to your logo image
 
 function FanatsyBox({ isAuthenticated }) {
   return (
-    <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-4 h-80 flex flex-col justify-between">
+    <div className="h-96 bg-gradient-to-r from-cyan-400 to-blue-500 p-4 flex flex-col justify-between">
       {/* Middle Content */}
       <div className="flex flex-col items-center justify-center flex-grow">
-        <div className="flex items-center">
-          <img src={logo} alt="Fantasy Logo" className="h-16 mr-4" />
-          <span className="text-4xl font-bold text-white">Fantasy</span>
+        <div className="flex items-center relative right-[10vw] sm:right-[23vw]">
+          <img src={logo} alt="Fantasy Logo" className="h-18 mr-4" />
         </div>
       </div>
 
       {/* Navigation Links */}
-      <div className="px-[990px] h-10 space-x-2">
+      <div className="flex flex-wrap justify-center space-x-2  relative right-[10vw] sm:right-[23vw]">
         {isAuthenticated ? (
           <>
-            <Link
-              to="/home"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/home" className="bg-green-400 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Home
             </Link>
-            <Link
-              to="/squad-selection"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/squad-selection" className="bg-green-400 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Squad Selection
             </Link>
-            <Link
-              to="/help"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/help" className="bg-green-400 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Help
             </Link>
-            <Link
-              to="/logout"
-              className="bg-red-500 text-white font-bold py-7 px-6 rounded hover:bg-red-600"
-            >
+            <Link to="/logout" className="bg-green-400 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Sign Out
             </Link>
           </>
         ) : (
           <>
-            <Link
-              to="/home"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/home" className="bg-green-600 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Home
             </Link>
-            <Link
-              to="/prizes"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/prizes" className="bg-green-600 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Prizes
             </Link>
-            <Link
-              to="/scout"
-              className="bg-white text-black font-bold py-7 px-6 rounded hover:bg-gray-200"
-            >
+            <Link to="/scout" className="bg-green-600 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Scout
             </Link>
-            <Link
-              to="/podcast"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/podcast" className="bg-green-600 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Podcast
             </Link>
-            <Link
-              to="/help"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/help" className="bg-green-600 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Help
             </Link>
-            <Link
-              to="/statistics"
-              className="bg-green-500 text-black font-bold py-7 px-6 rounded hover:bg-green-600"
-            >
+            <Link to="/statistics"className="bg-green-600 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               Statistics
             </Link>
-            <Link
-              to="/fpl-challenge"
-              className="bg-purple-500 text-white font-bold py-7 px-6 rounded hover:bg-purple-600"
-            >
+            <Link to="/fpl-challenge"className="bg-green-600 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">
               FPL Challenge
             </Link>
           </>

@@ -1,4 +1,3 @@
-# api/management/commands/update_premier_league_players.py
 import requests
 from django.core.management.base import BaseCommand
 from api.models import Player, Team
@@ -26,10 +25,10 @@ class Command(BaseCommand):
 
         # Position mapping
         position_map = {
-            1: 'Goalkeeper',
-            2: 'Defender',
-            3: 'Midfielder',
-            4: 'Forward'
+            1: 'GK',
+            2: 'DEF',
+            3: 'MID',
+            4: 'FWD'
         }
 
         for player in players:
@@ -39,6 +38,7 @@ class Command(BaseCommand):
             player_name = player['web_name']
             position = position_map.get(player['element_type'], 'Unknown')
             price = player['now_cost'] / 10.0  # FPL prices are in tenths of a million
+            image_url = f"https://resources.premierleague.com/premierleague/photos/players/110x140/p{player['code']}.png"
 
             player_obj, created = Player.objects.update_or_create(
                 name=player_name,
@@ -46,6 +46,7 @@ class Command(BaseCommand):
                     'position': position,
                     'team': team,
                     'price': price,
+                    'image': image_url
                 }
             )
 

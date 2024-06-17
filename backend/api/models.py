@@ -1,13 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    firstname = models.CharField(max_length=100, blank=True, null=True)
-    lastname = models.CharField(max_length=100, blank=True, null=True)
-
-    def __str__(self):
-        return self.user.username
 
 class League(models.Model):
     name = models.CharField(max_length=100)
@@ -16,16 +9,18 @@ class League(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
-    position = models.CharField(max_length=50)
+    position = models.CharField(max_length=10)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=6, decimal_places=2, default=0.0)  
+    price = models.DecimalField(max_digits=5, decimal_places=1)
+    image = models.URLField(null=True, blank=True)  # Allow null values for existing records
+    element_type = models.IntegerField(default=0)  # Add this field with a default valuee
 
     def __str__(self):
-        return f"{self.name} ({self.team}) - {self.price}m"
+        return self.name
