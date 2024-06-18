@@ -27,9 +27,17 @@ class LeagueSerializer(serializers.ModelSerializer):
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ['id', 'name', 'league', 'description']
+        fields = ['id', 'name',  'description']
 
 class PlayerSerializer(serializers.ModelSerializer):
+    team = TeamSerializer()
+
     class Meta:
         model = Player
-        fields = ['id', 'name', 'team', 'price', 'image', 'element_type']
+        fields = [
+            'id', 'name', 'team', 'price', 'image', 'element_type',
+            'assists', 'bonus', 'bps', 'clean_sheets', 'creativity',
+            'goals_conceded', 'goals_scored', 'ict_index', 'influence',
+            'minutes', 'own_goals', 'penalties_missed', 'penalties_saved',
+            'red_cards', 'saves', 'threat', 'total_points', 'yellow_cards'
+        ]

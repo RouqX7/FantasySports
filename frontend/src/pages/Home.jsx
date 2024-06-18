@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import FanatsyBar from '../components/FanatsyBar';
-import FanatsyBox from '../components/FantasyBox';
-import { ACCESS_TOKEN } from '../constants';
-import PickYourSquad from '../components/PickYourSquad';
-import Login from './Login';
-import JoinAndCreate from '../components/JoinAndCreate';
+import React, { useState, useEffect } from "react";
+import Navbar from "../components/Navbar";
+import FanatsyBar from "../components/FanatsyBar";
+import FanatsyBox from "../components/FantasyBox";
+import { ACCESS_TOKEN } from "../constants";
+import PickYourSquad from "../components/PickYourSquad";
+import Login from "./Login";
+import JoinAndCreate from "../components/JoinAndCreate";
+import ClubSites from "../components/ClubSites";
 
 function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,6 +19,7 @@ function Home() {
 
   return (
     <div>
+      <ClubSites />
       <Navbar />
       <FanatsyBar />
       <FanatsyBox isAuthenticated={isAuthenticated} />
@@ -29,9 +31,6 @@ function Home() {
           <div className="relative left-[20vw] sm:left-[20vw]">
             <JoinAndCreate isAuthenticated={isAuthenticated} />
           </div>
-          
-          
-          
         )}
       </div>
       {!isAuthenticated && <Login />}

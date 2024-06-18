@@ -14,9 +14,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-fuchsia-950 p-4">
-      <div className="px-56 justify-between items-center">
-        <div className="flex items-center space-x-7">
+    <nav className="bg-fuchsia-950 p-4 w-auto h-auto">
+      <div className="ml-56 justify-between items-center">
+        <div className="flex items-center space-x-7 ">
           {/* <div className="text-3xl font-bold text-white mr-4">FantasySports</div> */}
           <div className="relative mr-8">
             <button onClick={toggleMenuPremierLeague} className="text-white text-3xl font-bold  flex items-center">
