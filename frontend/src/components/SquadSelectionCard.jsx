@@ -18,8 +18,26 @@ function SquadSelectionCard() {
                 0/15
               </div>
             </div>
-            <div className="bg-red-600 w-[353px] h-[46px] mt-2 ml-1 flex items-center justify-center">
+            <div className="bg-red-600 w-[353px] h-[46px] mt-2 ml-1 flex flex-col items-center justify-start">
               {/* Content for the second box */}
+              <h3 className="font-premier text-sm font-medium">
+                Money Remaining
+              </h3>
+              <div className="border-box rounded-sm text-black bg-green-500 ">
+                100.0
+              </div>
+            </div>
+          </div>
+          <div className="bg-red-500 w-[706.25px] h-[44px] ml-2 flex">
+            <div className="bg-blue-200 w-[353px] h-[44px]  flex flex-col items-center justify-start">
+                <button className=" w-[230.41px] h-[44px]  bg-gray-100 rounded-sm font-premier ">
+                Auto Pick
+                </button>
+            </div>
+            <div className="bg-blue-200 w-[353px] h-[44px]  flex flex-col items-center justify-start">
+                <button className=" w-[230.41px] h-[44px]  bg-gray-100 rounded-sm font-premier ">
+                 Reset
+                </button>
             </div>
           </div>
         </div>
