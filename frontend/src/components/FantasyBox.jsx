@@ -4,16 +4,16 @@ import logo from "/src/assets/Fantasy.png"; // Update this path to your logo ima
 
 function FanatsyBox({ isAuthenticated }) {
   return (
-    <div className="h-96 bg-gradient-to-r from-cyan-400 to-blue-500 p-4 flex flex-col justify-between">
+    <div className="h-[246.72px]   bg-gradient-to-r from-cyan-400 to-blue-500 p-4 flex flex-col justify-between ">
       {/* Middle Content */}
       <div className="flex flex-col items-center justify-center flex-grow">
-        <div className="flex items-center relative right-[10vw] sm:right-[23vw]">
+        <div className="flex items-center mr-auto relative left-[18vw] sm:left-[18vw]">
           <img src={logo} alt="Fantasy Logo" className="h-18 mr-4" />
         </div>
       </div>
 
       {/* Navigation Links */}
-      <div className="flex flex-wrap justify-center space-x-2  relative right-[10vw] sm:right-[23vw]">
+      <div className="flex flex-wrap justify-center space-x-2  mr-auto relative left-[18vw] sm:left-[18vw]">
         {isAuthenticated ? (
           <>
             <Link to="/home" className="bg-green-400 text-black font-bold py-7 px-6 rounded hover:bg-gray-200">

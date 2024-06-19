@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Modal from 'react-modal';
+
+// Set the root element for the modal
+Modal.setAppElement('#root');
 
 const PlayerSelectionCard = ({ isAuthenticated }) => {
   const [players, setPlayers] = useState([]);
@@ -7,16 +11,45 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
   const [positionFilter, setPositionFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [playersPerPage] = useState(10);
+  const [playersPerPage] = useState(30);
   const [sortField, setSortField] = useState('total_points');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Mapping element_type to position
   const positionMap = {
     1: 'Goalkeeper',
     2: 'Defender',
     3: 'Midfielder',
     4: 'Attacker',
+  };
+
+  const positionAbbreviationMap = {
+    1: 'GKP',
+    2: 'DEF',
+    3: 'MID',
+    4: 'ATT',
+  };
+
+  const fieldNames = {
+    total_points: 'Total Points',
+    assists: 'Assists',
+    bonus: 'Bonus',
+    bps: 'BPS',
+    clean_sheets: 'Clean Sheets',
+    creativity: 'Creativity',
+    goals_conceded: 'Goals Conceded',
+    goals_scored: 'Goals Scored',
+    ict_index: 'ICT Index',
+    influence: 'Influence',
+    minutes: 'Minutes',
+    own_goals: 'Own Goals',
+    penalties_missed: 'Penalties Missed',
+    penalties_saved: 'Penalties Saved',
+    red_cards: 'Red Cards',
+    saves: 'Saves',
+    threat: 'Threat',
+    yellow_cards: 'Yellow Cards',
   };
 
   useEffect(() => {
@@ -40,7 +73,6 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
       return positionMatch && nameMatch;
     });
 
-    // Sort filtered players based on the sortField and sortDirection
     const sorted = [...filtered].sort((a, b) => {
       if (sortDirection === 'asc') {
         return a[sortField] > b[sortField] ? 1 : -1;
@@ -65,34 +97,22 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
   };
 
   const handlePositionFilterChange = event => setPositionFilter(event.target.value);
+  const handleSearchInputChange = event => setSearchQuery(event.target.value);
   const handleSortFieldChange = event => setSortField(event.target.value);
   const handleSortDirectionChange = event => setSortDirection(event.target.value);
-  const handleSearchInputChange = event => setSearchQuery(event.target.value);
 
-  // Human-readable field names for display in the table header
-  const fieldNames = {
-    total_points: 'Total Points',
-    assists: 'Assists',
-    bonus: 'Bonus',
-    bps: 'BPS',
-    clean_sheets: 'Clean Sheets',
-    creativity: 'Creativity',
-    goals_conceded: 'Goals Conceded',
-    goals_scored: 'Goals Scored',
-    ict_index: 'ICT Index',
-    influence: 'Influence',
-    minutes: 'Minutes',
-    own_goals: 'Own Goals',
-    penalties_missed: 'Penalties Missed',
-    penalties_saved: 'Penalties Saved',
-    red_cards: 'Red Cards',
-    saves: 'Saves',
-    threat: 'Threat',
-    yellow_cards: 'Yellow Cards',
+  const openModal = (player) => {
+    setSelectedPlayer(player);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedPlayer(null);
+    setIsModalOpen(false);
   };
 
   return (
-    <div className="player-selection-card bg-gray-100 rounded-lg p-4 mt-10 w-2/6 ml-auto mr-28">
+    <div className="player-selection-card bg-gray-100 rounded-lg p-4 mt-6 w-auto h-auto  ml-auto relative right-[19.5vw] sm:right-[19.5vw]">
       <div className="filter-container mb-4">
         <div className="mb-2">
           <label htmlFor="position" className="block font-bold mb-1">Position:</label>
@@ -105,18 +125,11 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
           </select>
         </div>
         <div className="mb-2">
-          <label htmlFor="sort-field" className="block font-bold mb-1">Sorted By:</label>
-          <select id="sort-field" value={sortField} onChange={handleSortFieldChange} className="w-full border-gray-300 rounded-md">
+          <label htmlFor="sorted-by" className="block font-bold mb-1">Sorted By:</label>
+          <select id="sorted-by" value={sortField} onChange={handleSortFieldChange} className="w-full border-gray-300 rounded-md">
             {Object.keys(fieldNames).map(key => (
               <option key={key} value={key}>{fieldNames[key]}</option>
             ))}
-          </select>
-        </div>
-        <div className="mb-2">
-          <label htmlFor="sort-direction" className="block font-bold mb-1">Sort Direction:</label>
-          <select id="sort-direction" value={sortDirection} onChange={handleSortDirectionChange} className="w-full border-gray-300 rounded-md">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
           </select>
         </div>
         <div>
@@ -130,30 +143,39 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-200">
-              <th className="py-2 px-4">Name</th>
-              <th className="py-2 px-4">Position</th>
-              <th className="py-2 px-4">Price</th>
+              <th className="py-2 px-4">Player</th>
+              <th className="py-2 px-4">£</th>
               <th className="py-2 px-4">{fieldNames[sortField]}</th>
             </tr>
           </thead>
           <tbody>
             {currentPlayers.map(player => (
-              <tr key={player.id} className="border-b border-gray-300">
-                <td className="py-2 px-4">{player.name}</td>
-                <td className="py-2 px-4">{positionMap[player.element_type] || 'Unknown'}</td>
-                <td className="py-2 px-4">{player.price}</td>
-                <td className="py-2 px-4">{player[sortField]}</td>
+              <tr key={player.id} className="border-b border-gray-300 cursor-pointer" onClick={() => openModal(player)}>
+                <td className="py-2 px-4 flex items-center">
+                  <img src={player.image} alt={player.name} className="w-8 h-8 rounded-full mr-2" />
+                  <div>
+                    <div className="font-bold">{player.name}</div>
+                    <div className="text-sm text-gray-500">{player.team.name} - {positionAbbreviationMap[player.element_type]}</div>
+                  </div>
+                </td>
+                <td className="py-2 px-4 text-center">
+                  <div className="text-xs text-gray-500">£</div>
+                  <div>{player.price}</div>
+                </td>
+                <td className="py-2 px-4 text-center">
+                  {player[sortField]}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="pagination mt-4">
+      <div className="pagination mt-4 flex justify-between">
         <button
           onClick={() => paginate('prev')}
           disabled={currentPage === 1}
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2"
+          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
         >
           Prev
         </button>
@@ -165,6 +187,22 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
           Next
         </button>
       </div>
+
+      {selectedPlayer && (
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={closeModal}
+          className="fixed inset-0 flex items-center justify-center z-50"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+        >
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96 relative">
+            <button onClick={closeModal} className="absolute top-2 right-2 text-2xl font-bold">&times;</button>
+            <h2 className="text-xl font-bold mb-4">{selectedPlayer.name}</h2>
+            <button onClick={() => alert('Player added')} className="bg-purple-500 text-white py-2 px-4 rounded mb-2 w-full">Add Player</button>
+            <button onClick={() => alert('Player information')} className="bg-gray-300 text-black py-2 px-4 rounded w-full">Player Information</button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
