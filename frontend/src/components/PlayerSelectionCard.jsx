@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 // Set the root element for the modal
 Modal.setAppElement('#root');
 
-const PlayerSelectionCard = ({ isAuthenticated }) => {
+const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [positionFilter, setPositionFilter] = useState('all');
@@ -111,8 +111,15 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
     setIsModalOpen(false);
   };
 
+  const handlePlayerSelect = () => {
+    if (selectedPlayer) {
+      onPlayerSelect(selectedPlayer); // Pass selected player to parent component
+      closeModal();
+    }
+  };
+
   return (
-    <div className="player-selection-card bg-gray-100 rounded-lg p-4 mt-6 w-auto h-auto  ml-auto relative right-[19.5vw] sm:right-[19.5vw]">
+    <div className="player-selection-card bg-gray-100 rounded-lg p-4 mt-6 w-auto h-auto  ml-auto relative right-[21.5vw] sm:right-[11.5vw]">
       <div className="filter-container mb-4">
         <div className="mb-2">
           <label htmlFor="position" className="block font-bold mb-1">Position:</label>
@@ -198,8 +205,19 @@ const PlayerSelectionCard = ({ isAuthenticated }) => {
           <div className="bg-white rounded-lg shadow-lg p-6 w-96 relative">
             <button onClick={closeModal} className="absolute top-2 right-2 text-2xl font-bold">&times;</button>
             <h2 className="text-xl font-bold mb-4">{selectedPlayer.name}</h2>
-            <button onClick={() => alert('Player added')} className="bg-purple-500 text-white py-2 px-4 rounded mb-2 w-full">Add Player</button>
-            <button onClick={() => alert('Player information')} className="bg-gray-300 text-black py-2 px-4 rounded w-full">Player Information</button>
+            <div className="flex items-center mb-4">
+              <img src={selectedPlayer.image} alt={selectedPlayer.name} className="w-12 h-12 rounded-full mr-4" />
+              <div>
+                <div className="font-bold">{selectedPlayer.team.name}</div>
+                <div className="text-sm text-gray-500">{positionMap[selectedPlayer.element_type]}</div>
+              </div>
+            </div>
+            <button
+              onClick={handlePlayerSelect}
+              className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
+            >
+              Select Player
+            </button>
           </div>
         </Modal>
       )}

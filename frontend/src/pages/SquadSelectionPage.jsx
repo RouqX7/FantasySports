@@ -9,6 +9,12 @@ import SquadSelectionCard from "../components/SquadSelectionCard";
 
 function SquadSelectionPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+  const handlePlayerSelect = (player) => {
+    setSelectedPlayer(player);
+  };
+
 
   useEffect(() => {
     // Check if the user is authenticated
@@ -23,8 +29,8 @@ function SquadSelectionPage() {
       <FanatsyBar />
       <FanatsyBox isAuthenticated={isAuthenticated} />
       <div className="flex">
-        <SquadSelectionCard />
-        <PlayerSelectionCard isAuthenticated={isAuthenticated} />
+        <SquadSelectionCard selectedPlayer={selectedPlayer} />
+        <PlayerSelectionCard isAuthenticated={isAuthenticated} onPlayerSelect={handlePlayerSelect} />
       </div>
     </div>
   );
