@@ -119,7 +119,7 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
   };
 
   return (
-    <div className="player-selection-card bg-gray-100 rounded-lg p-4 mt-6 w-auto h-auto  ml-auto relative right-[21.5vw] sm:right-[11.5vw]">
+    <div className="player-selection-card bg-gray-100 rounded-lg p-4 mt-6 w-auto h-auto ml-auto relative right-[21.5vw] sm:right-[11.5vw]">
       <div className="filter-container mb-4">
         <div className="mb-2">
           <label htmlFor="position" className="block font-bold mb-1">Position:</label>

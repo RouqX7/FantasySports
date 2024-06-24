@@ -12,7 +12,21 @@ function SquadSelectionPage() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   const handlePlayerSelect = (player) => {
-    setSelectedPlayer(player);
+    const positionMap = {
+      1: { min: 0, max: 1 },
+      2: { min: 2, max: 6 },
+      3: { min: 7, max: 11 },
+      4: { min: 12, max: 14 },
+    };
+    
+    const positionRange = positionMap[player.element_type];
+    const emptyIndex = selectedPlayers.findIndex((p, index) => index >= positionRange.min && index <= positionRange.max && p === null);
+
+    if (emptyIndex !== -1) {
+      const newSelectedPlayers = [...selectedPlayers];
+      newSelectedPlayers[emptyIndex] = player;
+      setSelectedPlayers(newSelectedPlayers);
+    }
   };
 
 
