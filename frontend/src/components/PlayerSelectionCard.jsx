@@ -206,18 +206,20 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
             <button onClick={closeModal} className="absolute top-2 right-2 text-2xl font-bold">&times;</button>
             <h2 className="text-xl font-bold mb-4">{selectedPlayer.name}</h2>
             <div className="flex items-center mb-4">
-              <img src={selectedPlayer.image} alt={selectedPlayer.name} className="w-12 h-12 rounded-full mr-4" />
+              <img src={selectedPlayer.image} alt={selectedPlayer.name} className="w-12 h-12 rounded-full mr-2" />
               <div>
                 <div className="font-bold">{selectedPlayer.team.name}</div>
-                <div className="text-sm text-gray-500">{positionMap[selectedPlayer.element_type]}</div>
+                <div className="text-sm text-gray-500">{positionAbbreviationMap[selectedPlayer.element_type]}</div>
               </div>
             </div>
-            <button
-              onClick={handlePlayerSelect}
-              className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
-            >
-              Select Player
-            </button>
+            <div className="text-gray-700 mb-4">
+              <p>Price: £{selectedPlayer.price}</p>
+              <p>Total Points: {selectedPlayer.total_points}</p>
+              <p>Goals Scored: {selectedPlayer.goals_scored}</p>
+              <p>Assists: {selectedPlayer.assists}</p>
+              {/* Add more stats as needed */}
+            </div>
+            <button onClick={handlePlayerSelect} className="bg-blue-500 text-white py-2 px-4 rounded-md">Select Player</button>
           </div>
         </Modal>
       )}
