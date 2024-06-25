@@ -136,6 +136,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Celery configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Adjust this to your Redis configuration
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Add this at the bottom of settings.py
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'fetch_player_performance_monthly': {
+        'task': 'api.tasks.fetch_player_performance',  # Adjust based on your app structure
+        'schedule': crontab(day_of_month='1'),  # Run on the 1st day of each month
+        # Example for hourly task once the season starts:
+        # 'schedule': crontab(hour='*'),  # Run every hour
+    },
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
