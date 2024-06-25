@@ -1,9 +1,6 @@
-# backend/api/management/commands/fetch_player_performance.py
-
 import requests
 from django.core.management.base import BaseCommand
-from django.utils.dateparse import parse_datetime
-from api.models import Player, PlayerPerformance, Team  # Adjust import as per your app structure
+from api.models import Player, PlayerPerformance, Team
 
 class Command(BaseCommand):
     help = 'Fetch player performance data from Fantasy Premier League API'
@@ -20,19 +17,33 @@ class Command(BaseCommand):
                 for player_data in players:
                     player_id = player_data['id']
                     player_name = player_data['web_name']
-                    team_name = player_data['team_name']
-                    
-                    # Assuming Team model has a 'name' field
-                    team, _ = Team.objects.get_or_create(name=team_name)
+                    team_id = player_data['team']
 
-                    player, _ = Player.objects.get_or_create(
+                    # Fetch team details based on team_id
+                    team_data = next((team for team in data['teams'] if team['id'] == team_id), None)
+                    if team_data:
+                        team_name = team_data['name']
+                        team, _ = Team.objects.get_or_create(name=team_name)
+                    else:
+                        self.stdout.write(self.style.ERROR(f"Team details not found for Team ID {team_id}"))
+                        continue
+
+                    # Prepare player fields
+                    player_defaults = {
+                        'name': player_name,
+                        'team': team,
+                        'price': player_data.get('now_cost', 0),  # Default price to 0 if not provided
+                        'element_type': player_data['element_type'],  # Ensure element_type is provided
+                        # Add other fields as needed
+                    }
+
+                    # Create or update Player instance
+                    player, _ = Player.objects.update_or_create(
                         id=player_id,
-                        defaults={
-                            'name': player_name,
-                            'team': team,
-                            # Add other fields as needed
-                        }
+                        defaults=player_defaults
                     )
+
+                    self.stdout.write(self.style.SUCCESS(f"Updated player details for Player ID {player_id}"))
 
                     # Fetch performance details for each player
                     player_performance_url = f"https://fantasy.premierleague.com/api/element-summary/{player_id}/"

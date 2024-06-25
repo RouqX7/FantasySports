@@ -6,9 +6,9 @@ from rest_framework import viewsets
 from django.contrib.auth.models import User
 from rest_framework import generics
 from .serializers import UserSerializer
-from .models import League, Team, Player,Squad, Transfer,Gameweek
+from .models import League, Team, Player,Squad, Transfer,Gameweek,PlayerPerformance
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import LeagueSerializer, TeamSerializer, PlayerSerializer, SquadSerializer,GameweekSerializer,TransferSerializer
+from .serializers import LeagueSerializer, TeamSerializer, PlayerSerializer, SquadSerializer,GameweekSerializer,TransferSerializer,PlayerPerformanceSerializer
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -25,7 +25,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 
 class TransferViewSet(viewsets.ModelViewSet):
     queryset = Transfer.objects.all()
-    serializer_class = GameweekSerializer
+    serializer_class = TransferSerializer
     permission_classes = [IsAuthenticated]
 
 
@@ -46,3 +46,9 @@ class SquadViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class PlayerPerformanceViewSet(viewsets.ModelViewSet):
+    queryset = PlayerPerformance.objects.all()
+    serializer_class = PlayerPerformanceSerializer
+    permission_classes = [IsAuthenticated]

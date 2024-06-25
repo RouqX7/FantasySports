@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import League, Team, Player, Squad, Gameweek, Transfer
+from .models import League, Team, Player, Squad, Gameweek, Transfer,PlayerPerformance
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -85,3 +85,14 @@ class SquadSerializer(serializers.ModelSerializer):
         squad.captain = captain_data
         squad.save()
         return squad
+    
+
+class PlayerPerformanceSerializer(serializers.ModelSerializer):
+    player_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PlayerPerformance
+        fields = ['id', 'player', 'player_name', 'gameweek', 'total_points', 'goals_scored', 'assists', 'clean_sheets', 'goals_conceded', 'saves']
+
+    def get_player_name(self, obj):
+        return obj.player.name

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from django.db.models import Count
+
 
 class League(models.Model):
     name = models.CharField(max_length=100)
@@ -140,3 +141,12 @@ def calculate_gameweek_points(self, gameweek):
             total_points += performance.total_points
         
         return total_points
+
+
+# Identify and possibly delete duplicates
+duplicate_players = Player.objects.values('name').annotate(count=Count('id')).filter(count__gt=1)
+
+for player in duplicate_players:
+    players_to_delete = Player.objects.filter(name=player['name']).order_by('id')[1:]
+    for player_to_delete in players_to_delete:
+        player_to_delete.delete()
