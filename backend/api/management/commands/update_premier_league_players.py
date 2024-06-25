@@ -1,4 +1,3 @@
-# management/commands/update_players.py
 import requests
 from django.core.management.base import BaseCommand
 from api.models import Player, Team
@@ -30,37 +29,28 @@ class Command(BaseCommand):
             image_url = f"https://resources.premierleague.com/premierleague/photos/players/110x140/p{player['code']}.png"
             element_type = player['element_type']
 
-            player_obj, created = Player.objects.update_or_create(
-                name=player_name,
-                defaults={
-                    'team': team,
-                    'price': price,
-                    'image': image_url,
-                    'element_type': element_type,
-                    'assists': player['assists'],
-                    'bonus': player['bonus'],
-                    'bps': player['bps'],
-                    'clean_sheets': player['clean_sheets'],
-                    'creativity': player['creativity'],
-                    'goals_conceded': player['goals_conceded'],
-                    'goals_scored': player['goals_scored'],
-                    'ict_index': player['ict_index'],
-                    'influence': player['influence'],
-                    'minutes': player['minutes'],
-                    'own_goals': player['own_goals'],
-                    'penalties_missed': player['penalties_missed'],
-                    'penalties_saved': player['penalties_saved'],
-                    'red_cards': player['red_cards'],
-                    'saves': player['saves'],
-                    'threat': player['threat'],
-                    'total_points': player['total_points'],
-                    'yellow_cards': player['yellow_cards']
-                }
-            )
+            # Ensure uniqueness using name and team
+            try:
+                player_obj = Player.objects.get(name=player_name, team=team)
+                created = False
+            except Player.DoesNotExist:
+                player_obj = Player.objects.create(
+                    name=player_name,
+                    team=team,
+                    price=price,
+                    image=image_url,
+                    element_type=element_type,
+                    # Add other fields here
+                )
+                created = True
+            except Player.MultipleObjectsReturned:
+                # Handle the case where multiple players with the same name and team exist
+                self.stdout.write(self.style.ERROR(f'Multiple players found for: {player_name} ({team_name})'))
+                continue
 
             if created:
-                self.stdout.write(self.style.SUCCESS(f'Added new player: {player_name}'))
+                self.stdout.write(self.style.SUCCESS(f'Added new player: {player_name} ({team_name})'))
             else:
-                self.stdout.write(self.style.SUCCESS(f'Updated player: {player_name}'))
+                self.stdout.write(self.style.SUCCESS(f'Player already exists: {player_name} ({team_name})'))
 
         self.stdout.write(self.style.SUCCESS('Successfully updated Premier League players'))
