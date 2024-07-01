@@ -217,7 +217,6 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
               <p>Total Points: {selectedPlayer.total_points}</p>
               <p>Goals Scored: {selectedPlayer.goals_scored}</p>
               <p>Assists: {selectedPlayer.assists}</p>
-              {/* Add more stats as needed */}
             </div>
             <button onClick={handlePlayerSelect} className="bg-blue-500 text-white py-2 px-4 rounded-md">Select Player</button>
           </div>

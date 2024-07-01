@@ -1,47 +1,98 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PitchSVG from "/src/assets/pitch-default.svg";
-import PlayerSelectionCard from "./PlayerSelectionCard";
 
-const SquadSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
-  const [selectedPlayers, setSelectedPlayers] = useState(Array(15).fill(null));
+const SquadSelectionCard = ({ selectedPlayers, setSelectedPlayers }) => {
+  const [selectedPlayersState, setSelectedPlayersState] = useState([...selectedPlayers]);
+  const [remainingBudget, setRemainingBudget] = useState(100.0);
   const [activeTab, setActiveTab] = useState("pitch");
 
-  const positionLabels = [
-    "Add Goalkeeper", "Add Goalkeeper",
-    "Add Defender", "Add Defender", "Add Defender", "Add Defender", "Add Defender",
-    "Add Midfielder", "Add Midfielder", "Add Midfielder", "Add Midfielder", "Add Midfielder",
-    "Add Attacker", "Add Attacker", "Add Attacker"
-  ];
+  useEffect(() => {
+    setSelectedPlayersState([...selectedPlayers]);
+    updateRemainingBudget(selectedPlayers);
+  }, [selectedPlayers]);
+
+  const updateRemainingBudget = (players) => {
+    const totalSpent = players.reduce((total, player) => {
+      if (player) {
+        return total + player.price;
+      }
+      return total;
+    }, 0);
+    const remainingBudget = 100.0 - totalSpent;
+    setRemainingBudget(remainingBudget);
+  };
 
   const handlePlayerSelect = (player) => {
-    const positionMap = {
-      1: { max: 1 },     // Goalkeepers
-      2: { min: 2, max: 6 },   // Defenders
-      3: { min: 7, max: 11 },  // Midfielders
-      4: { min: 12, max: 14 }, // Attackers
-    };
+    // Check if the player is already selected
+    if (selectedPlayersState.some(p => p && p.id === player.id)) {
+      alert("Player already selected");
+      return;
+    }
 
-    const { min, max } = positionMap[player.element_type];
-    const emptyIndex = selectedPlayers.findIndex(
-      (p, index) => index >= (min || 0) && index <= (max || 14) && p === null
+    // Check remaining budget
+    const newTotalSpent = selectedPlayersState.reduce((total, p) => {
+      if (p) {
+        return total + p.price;
+      }
+      return total;
+    }, 0) + player.price;
+
+    if (newTotalSpent > 100.0) {
+      alert("Insufficient budget");
+      return;
+    }
+
+    // Check team constraints (max 3 players from the same team)
+    const teamId = player.team.id;
+    const playersFromTeam = selectedPlayersState.filter(p => p && p.team.id === teamId);
+    if (playersFromTeam.length >= 3) {
+      alert(`You can only select up to 3 players from ${player.team.name}`);
+      return;
+    }
+
+    // Check position constraints (if required)
+    const positionRange = getPositionRange(player.element_type);
+    const emptyIndex = selectedPlayersState.findIndex(
+      (p, index) => index >= positionRange.min && index <= positionRange.max && p === null
     );
 
     if (emptyIndex !== -1) {
-      const newSelectedPlayers = [...selectedPlayers];
+      const newSelectedPlayers = [...selectedPlayersState];
       newSelectedPlayers[emptyIndex] = player;
-      setSelectedPlayers(newSelectedPlayers);
+
+      // Update local state
+      setSelectedPlayersState(newSelectedPlayers);
+
+      // Update parent component state using the passed prop
+      setSelectedPlayers(prevSelectedPlayers => {
+        const updatedPlayers = [...prevSelectedPlayers];
+        updatedPlayers[emptyIndex] = player;
+        return updatedPlayers;
+      });
+
+      // Update remaining budget
+      updateRemainingBudget(newSelectedPlayers);
+    } else {
+      alert("No available slot for this position");
     }
   };
 
   const renderCircle = (index) => {
-    const player = selectedPlayers[index];
+    const player = selectedPlayersState[index];
 
     return (
       <div className="relative">
         <div className="w-16 h-16 mb-8 bg-white rounded-full flex items-center justify-center text-black text-2xl font-bold">
           {!player && '+'}
+          {player && (
+            <img 
+              src={player.image} 
+              alt={player.name} 
+              className="w-full h-16 rounded-full" 
+            />
+          )}
         </div>
-        <div className="w-24  flex items-center justify-center text-xs font-medium absolute bottom-0 left-0 right-0 bg-gray-200">
+        <div className="w-24 flex items-center justify-center text-xs font-medium absolute bottom-0 left-0 right-0 bg-gray-200">
           {!player && positionLabels[index]}
           {player && (
             <div className="border-box rounded-sm text-white bg-red-600 w-[82.64px] h-[28px] flex items-center justify-center mt-1">
@@ -52,6 +103,23 @@ const SquadSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
       </div>
     );
   };
+
+  const getPositionRange = (element_type) => {
+    const positionMap = {
+      1: { min: 0, max: 1 },    // Goalkeepers
+      2: { min: 2, max: 6 },    // Defenders
+      3: { min: 7, max: 11 },   // Midfielders
+      4: { min: 12, max: 14 },  // Attackers
+    };
+    return positionMap[element_type];
+  };
+
+  const positionLabels = [
+    "Add Goalkeeper", "Add Goalkeeper",
+    "Add Defender", "Add Defender", "Add Defender", "Add Defender", "Add Defender",
+    "Add Midfielder", "Add Midfielder", "Add Midfielder", "Add Midfielder", "Add Midfielder",
+    "Add Attacker", "Add Attacker", "Add Attacker"
+  ];
 
   return (
     <div className="flex flex-col">
@@ -79,7 +147,7 @@ const SquadSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
                 Money Remaining
               </h3>
               <div className="border-box rounded-sm text-black bg-green-500 w-[82.64px] h-[28px] flex items-center justify-center mt-1">
-                100.0
+              £{remainingBudget.toFixed(1)}
               </div>
             </div>
           </div>
