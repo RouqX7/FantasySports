@@ -11,5 +11,5 @@ router.register(r'squads', SquadViewSet)
 router.register(r'transfers', TransferViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
 ]

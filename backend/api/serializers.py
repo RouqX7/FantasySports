@@ -53,20 +53,18 @@ class GameweekSerializer(serializers.ModelSerializer):
         fields = ['number', 'name', 'deadline_time', 'average_entry_score', 'highest_score', 'is_previous', 'is_current', 'is_next']        
 
 class SquadSerializer(serializers.ModelSerializer):
-    players = PlayerSerializer(many=True)
-    starting_lineup = PlayerSerializer(many=True)
-    captain = PlayerSerializer()
-    transfers = TransferSerializer(many=True, read_only=True)
+    players = serializers.PrimaryKeyRelatedField(queryset=Player.objects.all(), many=True)
+    starting_lineup = serializers.PrimaryKeyRelatedField(queryset=Player.objects.all(), many=True, required=False, allow_null=True)
+    captain = serializers.PrimaryKeyRelatedField(queryset=Player.objects.all(), required=False, allow_null=True)
 
     class Meta:
         model = Squad
         fields = ['id', 'user', 'players', 'starting_lineup', 'captain', 'budget', 'wildcard_used', 'bench_boost_used', 'free_hit_used', 'transfers_available', 'last_transfer_gameweek', 'transfers']
+        read_only_fields = ['user', 'transfers']
 
     def validate(self, data):
         if len(data['players']) > 15:
             raise serializers.ValidationError("Cannot have more than 15 players in a squad")
-        if len(data['starting_lineup']) > 11:
-            raise serializers.ValidationError("Cannot have more than 11 players in the starting lineup")
         team_counts = {}
         for player in data['players']:
             team_counts[player.team.id] = team_counts.get(player.team.id, 0) + 1
@@ -79,11 +77,13 @@ class SquadSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         players_data = validated_data.pop('players')
-        starting_lineup_data = validated_data.pop('starting_lineup')
-        captain_data = validated_data.pop('captain')
+        starting_lineup_data = validated_data.pop('starting_lineup', [])
+        captain_data = validated_data.pop('captain', None)
         squad = Squad.objects.create(**validated_data)
         squad.players.set(players_data)
-        squad.starting_lineup.set(starting_lineup_data)
-        squad.captain = captain_data
+        if starting_lineup_data:
+            squad.starting_lineup.set(starting_lineup_data)
+        if captain_data:
+            squad.captain = captain_data
         squad.save()
-        return squad        
+        return squad

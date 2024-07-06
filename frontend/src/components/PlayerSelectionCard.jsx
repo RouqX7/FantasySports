@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 // Set the root element for the modal
 Modal.setAppElement('#root');
 
-const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
+const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect, selectedPlayers = [], remainingBudget, selectedPlayersCount, maxPlayersFromSameTeam = 3 }) => {
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [positionFilter, setPositionFilter] = useState('all');
@@ -16,6 +16,7 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
   const [sortDirection, setSortDirection] = useState('desc');
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [notification, setNotification] = useState(null); // State for notifications
 
   const positionMap = {
     1: 'Goalkeeper',
@@ -103,6 +104,7 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
 
   const openModal = (player) => {
     setSelectedPlayer(player);
+    setNotification(null); // Clear previous notifications when opening a new modal
     setIsModalOpen(true);
   };
 
@@ -113,9 +115,61 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
 
   const handlePlayerSelect = () => {
     if (selectedPlayer) {
+      // Check if the player is already selected
+      if (selectedPlayers.some(p => p && p.id === selectedPlayer.id)) {
+        setNotification("Player already selected");
+        return;
+      }
+  
+      // Convert selectedPlayer.price from string to float
+      const playerPrice = parseFloat(selectedPlayer.price);
+  
+      // Check remaining budget
+      const newTotalSpent = selectedPlayers.reduce((total, p) => {
+        if (p && p.price) {
+          return total + parseFloat(p.price);
+        }
+        return total;
+      }, 0) + playerPrice;
+  
+      if (newTotalSpent > 100.0) {
+        setNotification("Insufficient budget");
+        return;
+      }
+  
+      // Check team constraints (max 3 players from the same team)
+      const teamId = selectedPlayer.team.id;
+      const playersFromTeam = selectedPlayers.filter(p => p && p.team.id === teamId);
+      if (playersFromTeam.length >= 3) {
+        setNotification(`You can only select up to 3 players from ${selectedPlayer.team.name}`);
+        return;
+      }
+  
       onPlayerSelect(selectedPlayer); // Pass selected player to parent component
       closeModal();
     }
+  };
+
+  const isPlayerSelected = (player) => {
+    if (!player) {
+      console.error('Player is null or undefined');
+      return false;
+    }
+    if (!Array.isArray(selectedPlayers)) {
+      console.error('selectedPlayers is not an array or is null/undefined');
+      return false;
+    }
+    return selectedPlayers.some(selected => {
+      if (!selected || !selected.id) {
+        console.error('Selected player or selected player id is null or undefined');
+        return false;
+      }
+      return selected.id === player.id;
+    });
+  };
+
+  const clearNotification = () => {
+    setNotification(null);
   };
 
   return (
@@ -157,7 +211,11 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
           </thead>
           <tbody>
             {currentPlayers.map(player => (
-              <tr key={player.id} className="border-b border-gray-300 cursor-pointer" onClick={() => openModal(player)}>
+              <tr
+                key={player.id}
+                className={`border-t border-gray-300 cursor-pointer ${isPlayerSelected(player) ? 'bg-gray-300 cursor-not-allowed' : ''}`}
+                onClick={() => !isPlayerSelected(player) && openModal(player)}
+              >
                 <td className="py-2 px-4 flex items-center">
                   <img src={player.image} alt={player.name} className="w-8 h-8 rounded-full mr-2" />
                   <div>
@@ -181,15 +239,13 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
       <div className="pagination mt-4 flex justify-between">
         <button
           onClick={() => paginate('prev')}
-          disabled={currentPage === 1}
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
         >
-          Prev
+          Previous
         </button>
         <button
           onClick={() => paginate('next')}
-          disabled={currentPlayers.length < playersPerPage}
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r"
         >
           Next
         </button>
@@ -204,6 +260,12 @@ const PlayerSelectionCard = ({ isAuthenticated, onPlayerSelect }) => {
         >
           <div className="bg-white rounded-lg shadow-lg p-6 w-96 relative">
             <button onClick={closeModal} className="absolute top-2 right-2 text-2xl font-bold">&times;</button>
+            {notification && (
+              <div className="bg-red-500 text-white p-2 rounded-md mb-4">
+                {notification}
+                <button onClick={clearNotification} className="ml-4 text-sm underline">Dismiss</button>
+              </div>
+            )}
             <h2 className="text-xl font-bold mb-4">{selectedPlayer.name}</h2>
             <div className="flex items-center mb-4">
               <img src={selectedPlayer.image} alt={selectedPlayer.name} className="w-12 h-12 rounded-full mr-2" />

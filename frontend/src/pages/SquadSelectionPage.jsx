@@ -45,11 +45,14 @@ function SquadSelectionPage() {
       <FanatsyBar />
       <FanatsyBox isAuthenticated={isAuthenticated} />
       <div className="flex">
-        <SquadSelectionCard selectedPlayers={selectedPlayers} />
+        <SquadSelectionCard           selectedPlayers={selectedPlayers}
+  />
         <PlayerSelectionCard
           isAuthenticated={isAuthenticated}
-          onPlayerSelect={handlePlayerSelect} // Pass handlePlayerSelect as prop
-        />
+          onPlayerSelect={handlePlayerSelect}
+          selectedPlayers={selectedPlayers}
+          
+          />
       </div>
     </div>
   );
